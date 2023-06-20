@@ -117,14 +117,12 @@ function App() {
                 })
                 .catch(() => {
                     setModalMessage(
-                        "You cannot place/ receive a call without granting video and audio permissions! Please change your settings to use Cuckoo."
+                        "You cannot place/ receive a call without granting video and audio permissions! Please change your settings."
                     );
                     setModalVisible(true);
                 });
         } else {
-            setModalMessage(
-                "We think the username entered is wrong. Please check again and retry!"
-            );
+            setModalMessage("Username is not valid. Please try again!");
             setModalVisible(true);
             return;
         }
