@@ -169,7 +169,7 @@ function App() {
             })
             .catch(() => {
                 setModalMessage(
-                    "You cannot place/ receive a call without granting video and audio permissions! Please change your settings to use Cuckoo."
+                    "You cannot place/ receive a call without granting video and audio permissions! Please change settings."
                 );
                 setModalVisible(true);
             });
