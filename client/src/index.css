@@ -425,3 +425,8 @@ body {
     width: 100%;
     height: auto;
 }
+
+.iconContainer:last-child {
+    background-color: red;
+    border-color: red;
+}

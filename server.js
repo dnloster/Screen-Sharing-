@@ -55,7 +55,7 @@ io.on("connection", (socket) => {
     });
 });
 
-const port = process.env.PORT || 4444;
+const port = 4444;
 
 server.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
