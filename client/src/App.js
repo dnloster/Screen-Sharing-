@@ -22,6 +22,7 @@ import minimize from "./icons/minimize.svg";
 import draw from "./icons/draw.svg";
 import ringtone from "./sound/ringtone.mp3";
 
+// Initial ringtone
 const ringtoneSound = new Howl({
     src: [ringtone],
     loop: true,
@@ -54,6 +55,7 @@ function App() {
     const myPeer = useRef();
     const canvasRef = useRef();
 
+    // bắt sự kiện bên server
     useEffect(() => {
         socket.current = io.connect("http://localhost:4444");
 
@@ -79,9 +81,7 @@ function App() {
                 .then((stream) => {
                     setStream(stream);
                     setCaller(id);
-                    if (userVideo.current) {
-                        userVideo.current.srcObject = stream;
-                    }
+                    userVideo.current.srcObject = stream;
                     const peer = new Peer({
                         initiator: true,
                         trickle: false,
@@ -120,12 +120,6 @@ function App() {
                     socket.current.on("rejected", () => {
                         window.location.reload();
                     });
-                })
-                .catch(() => {
-                    setModalMessage(
-                        "You cannot place/ receive a call without granting video and audio permissions! Please change your settings."
-                    );
-                    setModalVisible(true);
                 });
         } else {
             setModalMessage("Username is not valid. Please try again!");
@@ -140,9 +134,7 @@ function App() {
             .getUserMedia({ video: true, audio: true })
             .then((stream) => {
                 setStream(stream);
-                if (userVideo.current) {
-                    userVideo.current.srcObject = stream;
-                }
+                userVideo.current.srcObject = stream;
                 setCallAccepted(true);
                 const peer = new Peer({
                     initiator: false,
@@ -190,12 +182,6 @@ function App() {
                     }
                     window.location.reload();
                 });
-            })
-            .catch(() => {
-                setModalMessage(
-                    "You cannot place/ receive a call without granting video and audio permissions! Please change settings."
-                );
-                setModalVisible(true);
             });
     }
 
@@ -230,6 +216,7 @@ function App() {
         window.location.reload();
     }
 
+    // chia sẻ màn hình
     function shareScreen() {
         if (stream) {
             setIsShared(!isShared);
@@ -262,6 +249,7 @@ function App() {
             });
     }
 
+    // hàm bật/tắt âm thanh
     function toggleMuteAudio() {
         if (stream) {
             setAudioMuted(!audioMuted);
@@ -269,6 +257,7 @@ function App() {
         }
     }
 
+    // hàm bật/tắt hình ảnh
     function toggleMuteVideo() {
         if (stream) {
             setVideoMuted(!videoMuted);
@@ -284,6 +273,7 @@ function App() {
         }, 1000);
     }
 
+    // hàm bật/tắt chức năng vẽ lên màn hình
     function toggleDraw() {
         let canvas = new fabric.Canvas(canvasRef.current, {
             width: window.innerWidth,
@@ -316,7 +306,7 @@ function App() {
             canvas.off("before:path:created", startAddingLine);
             canvas.off("path:created", startDrawingLine);
         }
-        console.log(canvas);
+        // console.log(canvas);
     }
 
     let PartnerVideo;
@@ -413,16 +403,14 @@ function App() {
                 <div className="partnerVideoContainer">{PartnerVideo}</div>
 
                 <div className="userVideoContainer">
-                    {/* {console.log(stream)} */}
-                    {stream !== "undefined" && stream && (
-                        <video
-                            className="userVideo"
-                            playsInline
-                            muted
-                            ref={userVideo}
-                            autoPlay
-                        />
-                    )}
+                    {console.log(stream)}
+                    <video
+                        className="userVideo"
+                        playsInline
+                        muted
+                        ref={userVideo}
+                        autoPlay
+                    />
                 </div>
 
                 <div className="controlsContainer flex">
