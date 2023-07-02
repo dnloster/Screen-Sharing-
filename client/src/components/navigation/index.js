@@ -14,7 +14,7 @@ export const Navigation = () => {
                                     <div className="logoImg">
                                         <img src={Logo} alt="Logo" />
                                     </div>
-                                    <div className="logoText">Chat</div>
+                                    <div className="logoText">Video Chat</div>
                                 </div>
                             </a>
                         </div>

@@ -37,13 +37,13 @@ export const LandingHTML = (props) => {
                                     className="form-input"
                                 />
                                 <button
-                                    onClick={() =>
+                                    onClick={() => {
                                         props.callPeer(
                                             props.receiverID
                                                 .toLowerCase()
                                                 .trim()
-                                        )
-                                    }
+                                        );
+                                    }}
                                     className="primaryButton"
                                 >
                                     Call

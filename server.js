@@ -22,12 +22,12 @@ app.get("*", (req, res) => {
 const users = {};
 
 io.on("connection", (socket) => {
-    const userid = username.generateUsername();
+    //generate username against a socket connection and store it
+    const userid = username.generateUsername("-");
     if (!users[userid]) {
         users[userid] = socket.id;
     }
-
-    // send back username
+    //send back username
     socket.emit("yourID", userid);
     io.sockets.emit("allUsers", users);
 

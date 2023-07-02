@@ -3,10 +3,13 @@ import io from "socket.io-client";
 import Peer from "simple-peer";
 import Rodal from "rodal";
 import { Howl } from "howler";
+// import robot from "robotjs";
+import { fabric } from "fabric";
 
 import "rodal/lib/rodal.css";
 
 import { LandingHTML } from "./components/landingHTML";
+import "./App.css";
 
 import camera from "./icons/camera.svg";
 import camerastop from "./icons/cameraStop.svg";
@@ -42,11 +45,14 @@ function App() {
     const [videoMuted, setVideoMuted] = useState(false);
     const [isfullscreen, setFullscreen] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [isShared, setIsShared] = useState(false);
+    const [isDrawing, setIsDrawing] = useState(true);
 
     const userVideo = useRef();
     const partnerVideo = useRef();
     const socket = useRef();
     const myPeer = useRef();
+    const canvasRef = useRef();
 
     useEffect(() => {
         socket.current = io.connect("http://localhost:4444");
@@ -72,7 +78,6 @@ function App() {
                 .getUserMedia({ video: true, audio: true })
                 .then((stream) => {
                     setStream(stream);
-                    setCallingFriend(true);
                     setCaller(id);
                     if (userVideo.current) {
                         userVideo.current.srcObject = stream;
@@ -183,6 +188,7 @@ function App() {
                     if (partnerVideo.current) {
                         partnerVideo.current.srcObject = null;
                     }
+                    window.location.reload();
                 });
             })
             .catch(() => {
@@ -197,7 +203,7 @@ function App() {
         ringtoneSound.unload();
         setCallRejected(true);
         socket.current.emit("rejected", { to: caller });
-        // window.location.reload();
+        window.location.reload();
     }
 
     function endCall() {
@@ -221,11 +227,12 @@ function App() {
             partnerVideo.current.srcObject = null;
         }
         socket.current.emit("close", { to: caller });
-        // window.location.reload();
+        window.location.reload();
     }
 
     function shareScreen() {
         if (stream) {
+            setIsShared(!isShared);
             stream.getTracks().forEach((track) => {
                 if (track.kind === "video") {
                     track.stop();
@@ -277,6 +284,41 @@ function App() {
         }, 1000);
     }
 
+    function toggleDraw() {
+        let canvas = new fabric.Canvas(canvasRef.current, {
+            width: window.innerWidth,
+            height: window.innerHeight,
+            isDrawingMode: isDrawing,
+            freeDrawingBrush: new fabric.PencilBrush({
+                decimate: 8,
+                drawStraightLine: true,
+            }),
+        });
+
+        canvas.freeDrawingBrush.color = "#f1f500";
+        canvas.freeDrawingBrush.width = 5;
+
+        const startAddingLine = (opt) => {
+            var path = opt.path;
+            canvas.add(path);
+        };
+
+        const startDrawingLine = (opt) => {
+            canvas.remove(opt.path);
+        };
+
+        if (!isDrawing) {
+            setIsDrawing(!isDrawing);
+            canvas.on("before:path:created", startAddingLine);
+            canvas.on("path:created", startDrawingLine);
+        } else {
+            setIsDrawing(!isDrawing);
+            canvas.off("before:path:created", startAddingLine);
+            canvas.off("path:created", startDrawingLine);
+        }
+        console.log(canvas);
+    }
+
     let PartnerVideo;
     if (callAccepted && isfullscreen) {
         PartnerVideo = (
@@ -300,6 +342,11 @@ function App() {
 
     return (
         <>
+            {isShared && (
+                <>
+                    <canvas id="canvas" ref={canvasRef}></canvas>
+                </>
+            )}
             <div
                 style={{
                     display:
@@ -414,19 +461,22 @@ function App() {
                     )}
 
                     {/* share screen */}
-                    <span
-                        className="iconContainer"
-                        onClick={() => shareScreen()}
-                    >
-                        <img src={share} alt="Share screen" />
-                    </span>
 
-                    <span
-                        className="iconContainer"
-                        // onClick={() => toggleDrawing()}
-                    >
-                        <img src={draw} alt="Draw" />
-                    </span>
+                    {isShared ? (
+                        <span
+                            className="iconContainer"
+                            onClick={() => toggleDraw()}
+                        >
+                            <img src={draw} alt="Draw" />
+                        </span>
+                    ) : (
+                        <span
+                            className="iconContainer"
+                            onClick={() => shareScreen()}
+                        >
+                            <img src={share} alt="Share screen" />
+                        </span>
+                    )}
 
                     {/* toggle full screen */}
                     {isfullscreen ? (
